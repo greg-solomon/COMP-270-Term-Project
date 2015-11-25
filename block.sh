@@ -1,4 +1,4 @@
-BLOCKDB="/root/ip.block"
+BLOCKDB="/root/security/ip.block"
 IPS=$(grep -Ev "^#" $BLOCKDB)
 for i in $IPS
 do
