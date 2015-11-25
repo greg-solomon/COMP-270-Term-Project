@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import time,subprocess,os
+import time,os
 from re import *
 
 def tail(file):	# reads from beginning of file and waits at the end to return lines as they are generated
@@ -7,7 +7,7 @@ def tail(file):	# reads from beginning of file and waits at the end to return li
 	while True:
 		line = file.readline()
 		if not line:
-			time.sleep(60)
+			time.sleep(1)
 			continue
 		yield line
 		
@@ -26,33 +26,30 @@ def block(ip):	# creates an ip.block file for a shell script to use to block an 
 			blocked.close()
 			return
 		else:
-			block = open("ip.block","w")
-			blocked.close() 
-			blocked = open("ip.blocked","a")
-			blocked.write(ip+"\n")
-			block.write(ip)
-			
-			
 			blocked.close()
+			
+			block = open("ip.block","w")
+			block.write(ip)
 			block.close()
 			
-			# block ip and delete ip.block file
-			subprocess.call(['./block.sh'])
-			os.remove("ip.block")
+			# block ip and append it to blocked ip's file 
+			os.system('./block.sh')
+			
+			blocked = open("ip.blocked","a")
+			blocked.write(ip+"\n")
+			blocked.close()
+			time.sleep(5)
 	else:
 	#	ip.blocked doesn't exist so we start it
 	# 	ip.block is still necessary because the bash script is looking for ip.block
-		blocked = open("ip.blocked","w")
-		blocked.write(ip+"\n")
-		
 		block = open("ip.block", "w")
 		block.write(ip)
-		
-		blocked.close()
 		block.close()
 		
-		subprocess.call(['./block.sh'])
-		os.remove("ip.block")
+		os.system('./block.sh')
+		blocked = open("ip.blocked","w")
+		blocked.write(ip+"\n")
+		blocked.close()
 		
 		
 	
@@ -72,3 +69,10 @@ if __name__ == "__main__":
 					block(ip)
 			else:
 				catalog[ip] = 0
+			
+			
+			
+				
+	
+
+	
