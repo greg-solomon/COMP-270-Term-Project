@@ -17,8 +17,10 @@ def block(ip):	# creates an ip.block file for a shell script to use to block an 
 	for char in "[']":
 		ip = ip.replace(char,"")
 	
-	# check if the ip.blocked file already exists
+	# check if the ip.blocked file already exists for first time usage
 	if os.path.exists("ip.blocked"):
+	
+		
 		blocked = open("ip.blocked","r")
 		
 		
@@ -34,11 +36,11 @@ def block(ip):	# creates an ip.block file for a shell script to use to block an 
 			
 			# block ip and append it to blocked ip's file 
 			os.system('./block.sh')
-			
+			print ip + " blocked"
 			blocked = open("ip.blocked","a")
 			blocked.write(ip+"\n")
 			blocked.close()
-			time.sleep(5)
+			
 	else:
 	#	ip.blocked doesn't exist so we start it
 	# 	ip.block is still necessary because the bash script is looking for ip.block
@@ -47,6 +49,8 @@ def block(ip):	# creates an ip.block file for a shell script to use to block an 
 		block.close()
 		
 		os.system('./block.sh')
+		
+		print ip + " blocked"
 		blocked = open("ip.blocked","w")
 		blocked.write(ip+"\n")
 		blocked.close()
@@ -54,12 +58,17 @@ def block(ip):	# creates an ip.block file for a shell script to use to block an 
 		
 	
 if __name__ == "__main__":
+	# open secure log file for reading, start a dictionary to keep ip's and number of attempts
 	f = open("/var/log/secure","r")
 
 	catalog = {}
 	lines = tail(f)
 	
+	# as lines are read from tail function
 	for line in lines:
+	
+		# if line contains a string of invalid user, either add it to the dictionary as a key or increment the attempts value if it already exists
+		# call block function if attempts is over 3 
 		if search(r"Invalid user",line):
 			ip = findall(r'(?:[0-9]{1,3}\.){3}[0-9]{1,3}$', line)
 			ip = str(ip)
